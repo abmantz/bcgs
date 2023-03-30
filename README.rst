@@ -9,9 +9,9 @@
 Bayesian Conjugate Gibbs Sampler (BCGS)
 =====================================================================================
 
-----------------------------------------
+-------------------------------------------
 Lightweight, pure-Python conjugate sampling
-----------------------------------------
+-------------------------------------------
 
 BCGS is an implementation of Markov chain monte carlo using conjugate Gibbs sampling for performing Bayesian inference. Compared to software like JAGS and BUGS, BCGS is extremely crude and limited. It exists mainly for pedagogical purposes. It may also be a convenient solution for simple inference problems, as it is written in pure Python, with no dependences beyond ``numpy`` and ``scipy``, and requires no special installation.
 
