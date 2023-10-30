@@ -8,6 +8,7 @@ class NotConjugateError(Exception):
 
 class Parameter:
     def __init__(self, value=None, data=None):
+        self.update_overriden = False
         self.value = value
         self.data = data # NB we will be lazy and use (data is not None) to mean "fixed"
         if self.data is not None:
@@ -50,7 +51,7 @@ class Constant(Parameter):
 class Poisson(Parameter):
     def __init__(self, mean, *args, **kwargs):
         Parameter.__init__(self, *args, **kwargs)
-        if not isinstance(mean, (Constant, Deterministic, Gamma)):
+        if not (isinstance(mean, (Constant, Deterministic, Gamma)) or mean.update_overriden):
             raise NotConjugateError
         self.mean = mean
         mean.targets.append(self)
@@ -60,11 +61,11 @@ class Poisson(Parameter):
 class Gamma(Parameter):
     def __init__(self, shape, rate, *args, **kwargs):
         Parameter.__init__(self, *args, **kwargs)
-        if not isinstance(shape, (Constant, Deterministic)): # shape is conjugate to Gamma again (not implemented)
+        if not (isinstance(shape, (Constant, Deterministic)) or shape.update_overriden): # shape is conjugate to Gamma again (not implemented)
             raise NotConjugateError
         self.shape = shape
         shape.targets.append(self)
-        if not isinstance(rate, (Constant, Deterministic)): # rate is conjugate to something (not implemented)
+        if not (isinstance(rate, (Constant, Deterministic)) or n.update_overriden): # rate is conjugate to something (not implemented)
             raise NotConjugateError
         self.rate = rate
         rate.targets.append(self)
@@ -76,11 +77,11 @@ class Gamma(Parameter):
 class Binomial(Parameter):
     def __init__(self, p, n, *args, **kwargs):
         Parameter.__init__(self, *args, **kwargs)
-        if not isinstance(p, (Constant, Deterministic, Beta)):
+        if not (isinstance(p, (Constant, Deterministic, Beta)) or p.update_overriden):
             raise NotConjugateError
         self.p = p
         p.targets.append(self)
-        if not isinstance(n, (Constant)):
+        if not (isinstance(n, Constant) or n.update_overriden):
             raise Exception("Number of trials for the Binomial distribution must be Constant")
         self.n = n
         n.targets.append(self)
@@ -95,11 +96,11 @@ class Bernoulli(Binomial):
 class Beta(Parameter):
     def __init__(self, alpha, beta, *args, **kwargs):
         Parameter.__init__(self, *args, **kwargs)
-        if not isinstance(alpha, (Constant, Deterministic)): # possible todo
+        if not (isinstance(alpha, (Constant, Deterministic)) or alpha.update_overriden): # possible todo
             raise NotConjugateError
         self.alpha = alpha
         alpha.targets.append(self)
-        if not isinstance(beta, (Constant, Deterministic)): # possible todo
+        if not (isinstance(beta, (Constant, Deterministic)) or beta.update_overriden): # possible todo
             raise NotConjugateError
         self.beta = beta
         beta.targets.append(self)
@@ -111,11 +112,11 @@ class Beta(Parameter):
 class Normal(Parameter):
     def __init__(self, mean, variance, *args, **kwargs):
         Parameter.__init__(self, *args, **kwargs)
-        if not isinstance(mean, (Constant, Deterministic, Normal)):
+        if not (isinstance(mean, (Constant, Deterministic, Normal)) or mean.update_overriden):
             raise NotConjugateError
         self.mean = mean
         mean.targets.append(self)
-        if not isinstance(variance, (Constant, Deterministic, ScaledInverseChisquare)):
+        if not (isinstance(variance, (Constant, Deterministic, ScaledInverseChisquare)) or variance.update_overriden):
             raise NotConjugateError
         self.variance = variance
         variance.targets.append(self)
@@ -131,11 +132,11 @@ class Normal(Parameter):
 class ScaledInverseChisquare(Parameter):
     def __init__(self, dof, variance, *args, **kwargs):
         Parameter.__init__(self, *args, **kwargs)
-        if not isinstance(dof, (Constant, Deterministic)): # possible todo
+        if not (isinstance(dof, (Constant, Deterministic)) or dof.update_overriden): # possible todo
             raise NotConjugateError
         self.dof = dof
         dof.targets.append(self)
-        if not isinstance(variance, (Constant, Deterministic)): # possible todo
+        if not (isinstance(variance, (Constant, Deterministic)) or variance.update_overriden): # possible todo
             raise NotConjugateError
         self.variance = variance
         variance.targets.append(self)
